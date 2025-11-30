@@ -1,0 +1,3 @@
+#ignore extensionless files
+[^.]*$
+!Makefile
