@@ -1,13 +1,13 @@
 #include "Game.hpp"
 #include <iostream>
 
-Game::Game(int gridWidth, int gridHeight, int tileSize) 
-:   width(gridWidth * tileSize),
-    height(gridHeight * tileSize),
+Game::Game(int gridWidth, int gridHeight, int tileSize, float ori_x, float ori_y) 
+:   width(gridWidth * tileSize + 2 * ori_x),
+    height(gridHeight * tileSize + 2 * ori_y),
     window(sf::VideoMode({width, height}), "Homeless Kittens"){
     window.setVerticalSyncEnabled(true); // set freq same as monitor refresh rate
 
-    tilemap = new Tilemap(gridWidth, gridHeight, tileSize);
+    tilemap = new Tilemap(gridWidth, gridHeight, tileSize, ori_x, ori_y);
 }
 
 void Game::run(){
@@ -40,6 +40,12 @@ void Game::processEvent(){
         if(event.type == sf::Event::MouseButtonReleased){
             if(event.type == sf::Event::MouseLeft && lock_click == true){
                 lock_click = false;
+            }
+        }
+
+        if(event.type = sf::Event::KeyPressed){
+            if(event.key.code == sf::Keyboard::Enter){
+                tilemap->update();
             }
         }
     }

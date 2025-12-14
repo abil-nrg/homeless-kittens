@@ -5,7 +5,7 @@
 class Game
 {
     public:
-        Game(int gridWidth, int gridHeight, int tileSize);
+        Game(int gridWidth, int gridHeight, int tileSize, float ori_x, float ori_y);
         void run();
     private:
         void processEvent();

@@ -4,14 +4,14 @@
 class Tile
 {
     public:
-        Tile(bool walkable = true, sf::Color color = sf::Color::White)
-            : walkable(walkable), color(color) {}
+        Tile( int kind = 0, sf::Color color = sf::Color::White)
+            : kind(kind), color(color) {}
         
-        bool isWalkable() const {return walkable; }
+        const int getKind() const {return kind; }
         
         const sf::Color& getColor() const {return color; }
 
     private:
-        bool walkable;
+        int kind;
         sf::Color color;
 };
