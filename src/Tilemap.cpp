@@ -24,12 +24,13 @@ Tilemap::Tilemap(int WIDTH, int HEIGHT, int TILE_SIZE, float ORI_X, float ORI_Y)
 
     for(int y = 0; y < HEIGHT; y ++){ //paint the outside
         for(int x = 0; x < WIDTH; x++){
-            if(x == 0 | y == 0 | x == HEIGHT - 1 | y == WIDTH - 1){
+            /*if(x == 0 | y == 0 | x == HEIGHT - 1 | y == WIDTH - 1){
                 grid[y][x] = Tile(0, sf::Color::Red);
             }
             else{
                 grid[y][x] = Tile(1, sf::Color::Green);
-            }
+            }*/
+           grid[y][x] = Tile(1, sf::Color::Green);
         }
     }
 
@@ -100,13 +101,14 @@ void Tilemap::updateDirField(){
         for(int x = 0; x < WIDTH; x ++){
             Tile &tile = grid[y][x];
             int &dir = dir_field[y][x];
-
-            if(tile.getKind() == FACTORY){ //source
+            //find a factory, run thru it
+            if(tile.getKind() == FACTORY){
+                std::cout << "FOUND FACTORY AT (" << x << "," << y <<")\n";
                 if(!pathFinder(x,y, -1, -1))
                     std::cout << "Failed to find path\n";
             }
 
-            else if(tile.getKind() != HOUSE && tile.getKind() == TRACK){
+            else if(!dir){ //make sure we are not overwriting
                 dir = 0;
             }
         }
@@ -121,27 +123,64 @@ int Tilemap :: pathFinder(int x, int y, int prev_x, int prev_y){
     Tile &tile = grid[y][x];
     int &dir = dir_field[y][x];
 
+    std::cout << "at tile (" << x << "," << y << ") -- is " << tile.getKind() << " == marked as going ";
+
     if(tile.getKind() == HOUSE){ //we are done
+        std::cout << "HOUSE \n";
         dir = 0;
         return 1;
     }
     else if(tile.getKind() == TRACK){
-        // behavior depends on the combo of adjacencies
-        // factory + X : towards X
-        // X + house : towards house
-        // track + track : towards the track that isnt prev location
+        // always point toward non-prev neighbour
+        
+        if(grid[y][x + 1].getKind() != GRASS && ((y != prev_y) || (x + 1 != prev_x))){
+            dir = WEST;
+            std::cout << "WEST\n";
+            return pathFinder(x + 1, y, x, y);
+        }
+        else if(grid[y][x-1].getKind() != GRASS && ((y != prev_y) || (x - 1 != prev_x))){
+            dir = EAST;
+            std::cout << "EAST\n";
+            return pathFinder(x -1, y, x, y);
+        }
+        else if(grid[y - 1][x].getKind() != GRASS && ((y  - 1 != prev_y) || (x != prev_x))){
+            dir = NORTH;
+            std::cout << "NORTH\n";
+            return pathFinder(x, y - 1, x, y);
+        }
+        else if(grid[y + 1][x].getKind() != GRASS && ((y + 1 != prev_y) || (x != prev_x))){
+            dir = SOUTH;
+            std::cout << "SOUTH\n";
+            return pathFinder(x, y + 1, x, y);
+        }
+
     }
     else if(tile.getKind() == FACTORY){
+
+        std::cout << "factory \n";
         //look for neighbouring track, Prio in the below order
-        if(grid[y][x + 1].getKind() == TRACK)
-            dir = SOUTH;
-        else if(grid[y][x-1].getKind() == TRACK)
-            dir = NORTH;
-        else if(grid[y + 1][x].getKind() == TRACK)
+        if(grid[y][x + 1].getKind() == TRACK){
             dir = WEST;
-        else if(grid[y - 1][x].getKind() == TRACK)
+            return pathFinder(x + 1, y, x, y);
+        }
+        else if(grid[y][x-1].getKind() == TRACK){
             dir = EAST;
+            return pathFinder(x - 1, y, x, y);
+        }
+        else if(grid[y - 1][x].getKind() == TRACK){
+            dir = NORTH;
+            return pathFinder(x, y - 1, x, y);
+
+        }
+        else if(grid[y + 1][x].getKind() == TRACK){
+            dir = SOUTH;
+            return pathFinder(x, y + 1, x, y);
+
+        }
     }
+
+    std::cout << "pathFinder Broke on tile (" << x << "," << y << ")\n";
+    return 0;
     
 }
 
@@ -151,4 +190,13 @@ void Tilemap::update(){
     //find all kittys + create if need be
     //move them in the correct direction
     //make sure they are legal moves
+
+    std::cout << "DIRECTION FIELD\n";
+    for(int i = 0; i < HEIGHT; i ++){
+        for(int j = 0; j < WIDTH; j++){
+            std::cout << dir_field[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "==============\n";
 }

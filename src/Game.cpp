@@ -43,7 +43,7 @@ void Game::processEvent(){
             }
         }
 
-        if(event.type = sf::Event::KeyPressed){
+        if(event.type = sf::Event::KeyReleased){
             if(event.key.code == sf::Keyboard::Enter){
                 tilemap->update();
             }
