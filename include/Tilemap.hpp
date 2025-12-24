@@ -11,6 +11,9 @@ class Tilemap
         bool getTileFromPixel(int pixelX, int pixelY, int &tileX, int &tileY);
         void toggleTile(int x, int y);
         void updateDirField();
+        void moveKitty(std::vector<std::vector<Tile>> &grid_next);
+        void createKitty(std::vector<std::vector<Tile>> &grid_next);
+        Tile& getAdjTile(int x, int y, int dir, std::vector<std::vector<Tile>> &mat);
         int pathFinder(int x, int y, int prev_x, int prev_y);
         void update();
 

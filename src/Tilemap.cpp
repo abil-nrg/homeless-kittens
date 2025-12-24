@@ -115,6 +115,53 @@ void Tilemap::updateDirField(){
     }
 }
 
+void Tilemap::createKitty(std::vector<std::vector<Tile>> &grid_next){
+    /*
+    Handles the creation of kittys from factorys
+    at appropriate time
+    */
+}
+
+void Tilemap::moveKitty(std::vector<std::vector<Tile>> &grid_next){
+    /*
+    Moves existing kitties
+    */
+    
+    for(int y =0; y < HEIGHT; y ++){
+        for(int x = 0; x < WIDTH; x++){
+            Tile &tile = grid[y][x];
+            int dir = dir_field[y][x];
+            Tile &tile_next = getAdjTile(x , y, dir, grid);
+
+            if(tile.getKind() == KITTY){
+                std::cout << "FOUND KITTY AT (" << x << "," << y << ")\n";
+                grid_next[y][x] = Tile(TRACK, sf::Color::Black);
+
+                if(tile_next.getKind() == TRACK || tile_next.getKind() == KITTY){
+                    getAdjTile(x, y, dir, grid_next) = Tile(KITTY, sf::Color::Cyan);
+                }
+            }
+        }
+    }
+}
+
+Tile &Tilemap::getAdjTile(int x, int y, int dir, std::vector<std::vector<Tile>> &mat){
+    /*
+    Returns the tile DIR of the tile
+    */
+
+    if(dir == NORTH)
+        y --;
+    else if(dir == SOUTH)
+        y ++;
+    else if(dir == WEST)
+        x --;
+    else if(dir == EAST)
+        x ++;
+
+    return mat[y][x];
+}
+
 int Tilemap :: pathFinder(int x, int y, int prev_x, int prev_y){
     /*
     Given your current location, recursevly 
@@ -125,22 +172,24 @@ int Tilemap :: pathFinder(int x, int y, int prev_x, int prev_y){
 
     std::cout << "at tile (" << x << "," << y << ") -- is " << tile.getKind() << " == marked as going ";
 
-    if(tile.getKind() == HOUSE){ //we are done
+    int tile_kind = tile.getKind();
+
+    if(tile_kind == HOUSE){ //we are done
         std::cout << "HOUSE \n";
         dir = 0;
         return 1;
     }
-    else if(tile.getKind() == TRACK){
+    else if(tile_kind == TRACK || tile_kind == KITTY){
         // always point toward non-prev neighbour
         
         if(grid[y][x + 1].getKind() != GRASS && ((y != prev_y) || (x + 1 != prev_x))){
-            dir = WEST;
-            std::cout << "WEST\n";
+            dir = EAST;
+            std::cout << "EAST\n";
             return pathFinder(x + 1, y, x, y);
         }
         else if(grid[y][x-1].getKind() != GRASS && ((y != prev_y) || (x - 1 != prev_x))){
-            dir = EAST;
-            std::cout << "EAST\n";
+            dir = WEST;
+            std::cout << "WEST\n";
             return pathFinder(x -1, y, x, y);
         }
         else if(grid[y - 1][x].getKind() != GRASS && ((y  - 1 != prev_y) || (x != prev_x))){
@@ -156,23 +205,23 @@ int Tilemap :: pathFinder(int x, int y, int prev_x, int prev_y){
 
     }
     else if(tile.getKind() == FACTORY){
-
+        //TODO ALLOW KITTENS NEAR THE FACTORY
         std::cout << "factory \n";
         //look for neighbouring track, Prio in the below order
-        if(grid[y][x + 1].getKind() == TRACK){
-            dir = WEST;
+        if(grid[y][x + 1].getKind() != GRASS){
+            dir = EAST;
             return pathFinder(x + 1, y, x, y);
         }
-        else if(grid[y][x-1].getKind() == TRACK){
-            dir = EAST;
+        else if(grid[y][x-1].getKind() != GRASS){
+            dir = WEST;
             return pathFinder(x - 1, y, x, y);
         }
-        else if(grid[y - 1][x].getKind() == TRACK){
+        else if(grid[y - 1][x].getKind() != GRASS){
             dir = NORTH;
             return pathFinder(x, y - 1, x, y);
 
         }
-        else if(grid[y + 1][x].getKind() == TRACK){
+        else if(grid[y + 1][x].getKind() != GRASS){
             dir = SOUTH;
             return pathFinder(x, y + 1, x, y);
 
@@ -186,11 +235,16 @@ int Tilemap :: pathFinder(int x, int y, int prev_x, int prev_y){
 
 void Tilemap::update(){
 
-    updateDirField();
-    //find all kittys + create if need be
-    //move them in the correct direction
-    //make sure they are legal moves
+    //Yes, I loop over grid in each function, even tho 
+    //I could do it once. I thought its more important
+    //to keep this readable. My CPU strong enough!
 
+    std::vector<std::vector<Tile>> grid_next = grid;
+    updateDirField();
+    moveKitty(grid_next);
+    createKitty(grid_next);
+    grid = grid_next;
+    
     std::cout << "DIRECTION FIELD\n";
     for(int i = 0; i < HEIGHT; i ++){
         for(int j = 0; j < WIDTH; j++){
@@ -200,3 +254,4 @@ void Tilemap::update(){
     }
     std::cout << "==============\n";
 }
+

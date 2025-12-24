@@ -6,6 +6,7 @@ Game::Game(int gridWidth, int gridHeight, int tileSize, float ori_x, float ori_y
     height(gridHeight * tileSize + 2 * ori_y),
     window(sf::VideoMode({width, height}), "Homeless Kittens"){
     window.setVerticalSyncEnabled(true); // set freq same as monitor refresh rate
+    window.setKeyRepeatEnabled(false);
 
     tilemap = new Tilemap(gridWidth, gridHeight, tileSize, ori_x, ori_y);
 }
@@ -43,7 +44,7 @@ void Game::processEvent(){
             }
         }
 
-        if(event.type = sf::Event::KeyReleased){
+        if(event.type = sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::Enter){
                 tilemap->update();
             }
