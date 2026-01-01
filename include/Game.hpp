@@ -16,4 +16,6 @@ class Game
         int height;
         sf::RenderWindow window;
         Tilemap* tilemap;
+        int score;
+        sf::Font font;
 };

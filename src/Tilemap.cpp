@@ -122,7 +122,7 @@ void Tilemap::createKitty(std::vector<std::vector<Tile>> &grid_next){
     */
 }
 
-void Tilemap::moveKitty(std::vector<std::vector<Tile>> &grid_next){
+void Tilemap::moveKitty(std::vector<std::vector<Tile>> &grid_next, int &inc){
     /*
     Moves existing kitties
     */
@@ -140,9 +140,14 @@ void Tilemap::moveKitty(std::vector<std::vector<Tile>> &grid_next){
                 if(tile_next.getKind() == TRACK || tile_next.getKind() == KITTY){
                     getAdjTile(x, y, dir, grid_next) = Tile(KITTY, sf::Color::Cyan);
                 }
+
+                if(tile_next.getKind() == HOUSE){
+                    inc++;
+                }
             }
         }
     }
+    
 }
 
 Tile &Tilemap::getAdjTile(int x, int y, int dir, std::vector<std::vector<Tile>> &mat){
@@ -233,15 +238,16 @@ int Tilemap :: pathFinder(int x, int y, int prev_x, int prev_y){
     
 }
 
-void Tilemap::update(){
+int Tilemap::update(int score){
 
     //Yes, I loop over grid in each function, even tho 
     //I could do it once. I thought its more important
     //to keep this readable. My CPU strong enough!
 
     std::vector<std::vector<Tile>> grid_next = grid;
+    int inc=0;
     updateDirField();
-    moveKitty(grid_next);
+    moveKitty(grid_next, inc);
     createKitty(grid_next);
     grid = grid_next;
     
@@ -253,5 +259,7 @@ void Tilemap::update(){
         std::cout << "\n";
     }
     std::cout << "==============\n";
+
+    return score + inc;
 }
 

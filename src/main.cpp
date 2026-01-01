@@ -4,9 +4,9 @@
 #include "Game.hpp"
 
 int main(){
-    int width = 25;
-    int height = 25;
-    int tile_size = 30;
+    int width = 30;
+    int height = 30;
+    int tile_size = 25;
     float ori_x = 100.0f;
     float ori_y = 100.0f;
     Game game(width, height, tile_size, ori_x, ori_y);

@@ -4,9 +4,13 @@
 Game::Game(int gridWidth, int gridHeight, int tileSize, float ori_x, float ori_y) 
 :   width(gridWidth * tileSize + 2 * ori_x),
     height(gridHeight * tileSize + 2 * ori_y),
-    window(sf::VideoMode({width, height}), "Homeless Kittens"){
+    window(sf::VideoMode({width, height}), "Homeless Kittens"),
+    score(0),
+    font(sf::Font()){
     window.setVerticalSyncEnabled(true); // set freq same as monitor refresh rate
     window.setKeyRepeatEnabled(false);
+    if(!font.loadFromFile("assets/comicsans.ttf"))
+       std::cout << "Error Opening Font File\n";
 
     tilemap = new Tilemap(gridWidth, gridHeight, tileSize, ori_x, ori_y);
 }
@@ -44,9 +48,9 @@ void Game::processEvent(){
             }
         }
 
-        if(event.type = sf::Event::KeyPressed){
+        if(event.type == sf::Event::KeyPressed){
             if(event.key.code == sf::Keyboard::Enter){
-                tilemap->update();
+                score = tilemap->update(score);
             }
         }
     }
@@ -54,10 +58,20 @@ void Game::processEvent(){
 
 void Game::update(){
     //amazing game logic goes here
+
+
 }
 
 void Game::render(){
     window.clear();
+    sf::Text score_display;
+    score_display.setFont(font);
+    score_display.setString("Score: " + std::to_string(score));
+    score_display.setPosition(30, 30);
+    score_display.setCharacterSize(24);
+    score_display.setFillColor(sf::Color::White);
+
     tilemap->draw(window);
+    window.draw(score_display);
     window.display();
 }
