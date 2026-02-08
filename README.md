@@ -15,3 +15,5 @@ make
 And you will start playing.
 
 ## How to Play
+
+Click on the buttons!
